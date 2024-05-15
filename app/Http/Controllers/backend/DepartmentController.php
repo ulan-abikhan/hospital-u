@@ -4,78 +4,82 @@ namespace App\Http\Controllers\backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Department;
+use App\Models\Hospital;
+use App\Models\Service;
 use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $departments = Department::all();
+  /**
+   * Display a listing of the resource.
+   */
+  public function index($id)
+  {
+    $departments = Department::where('hospital_id', $id)->get();
+    $hospital = Hospital::find($id);
 
-        return view('departments', $departments);
+    return view('content.departments', ['departments' => $departments, 'hospital' => $hospital]);
+  }
+
+  /**
+   * Show the form for creating a new resource.
+   */
+  public function create()
+  {
+    //
+  }
+
+  /**
+   * Store a newly created resource in storage.
+   */
+  public function store(Request $request)
+  {
+    if ($request->user()->role != 'admin') {
+      return response(['message' => 'No permission'], 403);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+    $request->validate([
+      'name' => 'required|string',
+    ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        if ($request->user()->role != 'admin') {
-          return response(["message"=>"No permission"], 403);
-        }
+    Department::create([
+      'name' => $request['name'],
+    ]);
 
-        $request->validate([
-          'name'=>'required|string'
-        ]);
+    return response(status: 201);
+  }
 
-        Department::create([
-          'name'=>$request['name']
-        ]);
+  /**
+   * Display the specified resource.
+   */
+  public function show(string $id)
+  {
+    $department = Department::find($id);
 
-        return response(status: 201);
-    }
+    return view('content.department', ['department' => $department]);
+  }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $department = Department::find($id);
+  /**
+   * Show the form for editing the specified resource.
+   */
+  public function edit(string $id)
+  {
+    //
+  }
 
-    }
+  /**
+   * Update the specified resource in storage.
+   */
+  public function update(Request $request, string $id)
+  {
+    //
+  }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+  /**
+   * Remove the specified resource from storage.
+   */
+  public function destroy(string $id)
+  {
+    //
+  }
 }

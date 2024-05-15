@@ -7,5 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Record extends Model
 {
-    use HasFactory;
+  use HasFactory;
+
+  protected $fillable = ['client_id', 'doctor_id', 'service_id', 'date', 'start', 'end'];
+
+  function recordInfo()
+  {
+    return $this->hasOne(RecordInfo::class);
+  }
 }

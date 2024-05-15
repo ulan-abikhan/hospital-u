@@ -2,20 +2,18 @@
 
 use App\Http\Controllers\backend\AuthController;
 use App\Http\Controllers\backend\DepartmentController;
+use App\Http\Controllers\backend\DoctorController;
+use App\Http\Controllers\backend\ScheduleController;
 use App\Http\Controllers\backend\UserController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\dashboard\Analytics;
-use App\Http\Controllers\layouts\WithoutMenu;
-use App\Http\Controllers\layouts\WithoutNavbar;
-use App\Http\Controllers\layouts\Fluid;
-use App\Http\Controllers\layouts\Container;
-use App\Http\Controllers\layouts\Blank;
 use App\Http\Controllers\pages\AccountSettingsAccount;
 use App\Http\Controllers\pages\AccountSettingsNotifications;
 use App\Http\Controllers\pages\AccountSettingsConnections;
 use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\authentications\RegisterBasic;
 use App\Http\Controllers\authentications\ForgotPasswordBasic;
+use App\Http\Controllers\backend\AdminController;
+use App\Http\Controllers\backend\HospitalController as BackendHospitalController;
 use App\Http\Controllers\cards\CardBasic;
 use App\Http\Controllers\user_interface\Accordion;
 use App\Http\Controllers\user_interface\Alerts;
@@ -36,27 +34,25 @@ use App\Http\Controllers\user_interface\TabsPills;
 use App\Http\Controllers\user_interface\Toasts;
 use App\Http\Controllers\user_interface\TooltipsPopovers;
 use App\Http\Controllers\user_interface\Typography;
-use App\Http\Controllers\extended_ui\PerfectScrollbar;
-use App\Http\Controllers\extended_ui\TextDivider;
-use App\Http\Controllers\icons\MdiIcons;
 use App\Http\Controllers\form_elements\BasicInput;
 use App\Http\Controllers\form_elements\InputGroups;
 use App\Http\Controllers\form_layouts\VerticalForm;
 use App\Http\Controllers\form_layouts\HorizontalForm;
+use App\Http\Controllers\backend\NewsController;
+use App\Http\Controllers\backend\ServiceController;
+use App\Http\Controllers\dashboard\Analytics;
 use App\Http\Controllers\tables\Basic as TablesBasic;
 
-
-// layout
-Route::get('/layouts/without-menu', [WithoutMenu::class, 'index'])->name('layouts-without-menu');
-Route::get('/layouts/without-navbar', [WithoutNavbar::class, 'index'])->name('layouts-without-navbar');
-Route::get('/layouts/fluid', [Fluid::class, 'index'])->name('layouts-fluid');
-Route::get('/layouts/container', [Container::class, 'index'])->name('layouts-container');
-Route::get('/layouts/blank', [Blank::class, 'index'])->name('layouts-blank');
-
 // pages
-Route::get('/pages/account-settings-account', [AccountSettingsAccount::class, 'index'])->name('pages-account-settings-account');
-Route::get('/pages/account-settings-notifications', [AccountSettingsNotifications::class, 'index'])->name('pages-account-settings-notifications');
-Route::get('/pages/account-settings-connections', [AccountSettingsConnections::class, 'index'])->name('pages-account-settings-connections');
+Route::get('/pages/account-settings-account', [AccountSettingsAccount::class, 'index'])->name(
+  'pages-account-settings-account'
+);
+Route::get('/pages/account-settings-notifications', [AccountSettingsNotifications::class, 'index'])->name(
+  'pages-account-settings-notifications'
+);
+Route::get('/pages/account-settings-connections', [AccountSettingsConnections::class, 'index'])->name(
+  'pages-account-settings-connections'
+);
 
 // authentication
 Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('login');
@@ -87,13 +83,6 @@ Route::get('/ui/toasts', [Toasts::class, 'index'])->name('ui-toasts');
 Route::get('/ui/tooltips-popovers', [TooltipsPopovers::class, 'index'])->name('ui-tooltips-popovers');
 Route::get('/ui/typography', [Typography::class, 'index'])->name('ui-typography');
 
-// extended ui
-Route::get('/extended/ui-perfect-scrollbar', [PerfectScrollbar::class, 'index'])->name('extended-ui-perfect-scrollbar');
-Route::get('/extended/ui-text-divider', [TextDivider::class, 'index'])->name('extended-ui-text-divider');
-
-// icons
-Route::get('/icons/icons-mdi', [MdiIcons::class, 'index'])->name('icons-mdi');
-
 // form elements
 Route::get('/forms/basic-inputs', [BasicInput::class, 'index'])->name('forms-basic-inputs');
 Route::get('/forms/input-groups', [InputGroups::class, 'index'])->name('forms-input-groups');
@@ -113,10 +102,54 @@ Route::get('auth/discard-mail', [UserController::class, 'discard']);
 
 Route::post('auth/login', [AuthController::class, 'login'])->name('login-post');
 
+Route::get('/dash', [Analytics::class, 'index'])->name('dashboard-analytics');
+
 Route::middleware('auth')->group(function () {
-    Route::get('/', [Analytics::class, 'index'])->name('dashboard-analytics');
+  //   Route::resource('departments', DepartmentController::class);
 
-    Route::resource('departments', DepartmentController::class);
+  Route::get('hospitals/{id}/departments', [DepartmentController::class, 'index']);
 
-    Route::post('user/update', [UserController::class, 'update'])->name('update-user');
+  Route::get('hospitals/{id}/news', [NewsController::class, 'index']);
+
+  Route::get('news/{id}', [NewsController::class, 'show']);
+
+  Route::get('hospitals/{id}/personal', [DoctorController::class, 'personal']);
+
+  Route::get('personal/{id}', [DoctorController::class, 'person']);
+
+  Route::get('hospitals/{id}/services', [ServiceController::class, 'index']);
+
+  Route::get('departments/{id}', [DepartmentController::class, 'show']);
+
+  Route::resource('doctors', DoctorController::class);
+
+  Route::get('services/{id}/{doctors}', [DoctorController::class, 'index']);
+
+  Route::resource('hospitals', BackendHospitalController::class);
+
+  Route::get('hospitals/{id}/info', [BackendHospitalController::class, 'info']);
+
+  Route::get('doctors/{doctorId}/schedules/{day}', [ScheduleController::class, 'showByDate']);
+
+  Route::get('/', [ScheduleController::class, 'index']);
+
+  Route::post('schedules', [ScheduleController::class, 'store']);
+
+  Route::post('user/update', [UserController::class, 'update'])->name('update-user');
+
+  Route::get('auth/logout', [AuthController::class, 'logout'])->name('logout');
+
+  Route::post('records/{id}', [AdminController::class, 'store']);
+
+  Route::get('admin', [AdminController::class, 'show'])->name('admin');
+
+  Route::get('records/{id}', [AdminController::class, 'index']);
+
+  Route::get('patients', [UserController::class, 'index']);
+
+  Route::get('patient-self', [UserController::class, 'me']);
+
+  Route::get('patients/{id}', [UserController::class, 'show']);
 });
+
+Route::get('zozh', [BackendHospitalController::class, 'zozh']);

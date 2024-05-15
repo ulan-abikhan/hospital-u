@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class DoctorServiceLink extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['doctor_id', 'service_id'];
 }

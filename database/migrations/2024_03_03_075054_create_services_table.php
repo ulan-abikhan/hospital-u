@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('department_id')->constrained('departments')->cascadeOnDelete();
             $table->string('name');
+            $table->text('description')->nullable()->default(null);
+            $table->integer('parlor');
             $table->decimal('price', 8, 2);
             $table->time('duration');
             $table->timestamps();

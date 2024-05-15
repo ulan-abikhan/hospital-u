@@ -7,9 +7,7 @@
           document.write(new Date().getFullYear())
         </script>, made with <span class="text-danger"><i class="tf-icons mdi mdi-heart"></i></span> by <a href="{{ (!empty(config('variables.creatorUrl')) ? config('variables.creatorUrl') : '') }}" target="_blank" class="footer-link fw-medium">{{ (!empty(config('variables.creatorName')) ? config('variables.creatorName') : '') }}</a>
       </div>
-      <div  class="d-none d-lg-inline-block">
-        <a href="{{ config('variables.licenseUrl') ? config('variables.licenseUrl') : '#' }}" class="footer-link me-3" target="_blank">License</a>
-      </div>
+
     </div>
   </div>
 </footer>
